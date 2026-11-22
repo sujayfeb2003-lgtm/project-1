@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eduverse - Authentication</title>
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-hover: #4338CA;
+      --primary-light: #EEF2FF;
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --success: #16A34A;
+      --success-bg: #DCFCE7;
+      --error: #DC2626;
+      --error-bg: #FEE2E2;
+      --radius: 12px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font);
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .auth-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 440px;
+      padding: 36px;
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo-badge {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 12px;
+      box-shadow: 0 6px 18px rgba(4, 1, 92, 0.25);
+    }
+
+    .logo-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .auth-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+
+    .auth-header p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: #F1F5F9;
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .mode-tab {
+      border: none;
+      background: transparent;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-tab.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s ease;
+      background: #FFFFFF;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-danger {
+      background: var(--error);
+      color: white;
+      margin-top: 16px;
+    }
+
+    .secondary-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+
+    .link-btn:hover {
+      text-decoration: underline;
+    }
+
+    .alert {
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      display: none;
+      line-height: 1.4;
+    }
+
+    .alert-success {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid rgba(22, 163, 74, 0.2);
+    }
+
+    .alert-error {
+      background: var(--error-bg);
+      color: var(--error);
+      border: 1px solid rgba(220, 38, 38, 0.2);
+    }
+
+    .alert-info {
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid rgba(79, 70, 229, 0.2);
+    }
+
+    .user-profile {
+      display: none;
+      text-align: center;
+    }
+
+    .user-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--success-bg);
+      color: var(--success);
+      font-size: 24px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .user-email {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .user-uid {
+      font-size: 11px;
+      font-family: monospace;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo-badge"><img src="./eduverse-logo.png" alt="Eduverse Logo" /></div>
+      <h1>Eduverse Access</h1>
+      <p id="subheading">Sign in with Email &amp; Password or Magic Link</p>
+    </div>
+
+    <!-- Alert Notifications -->
+    <div id="alert-box" class="alert"></div>
+
+    <!-- Signed-Out View (Form) -->
+    <div id="auth-form-container">
+      <div class="mode-tabs">
+        <button type="button" id="tab-password" class="mode-tab active">Email &amp; Password</button>
+        <button type="button" id="tab-magic-link" class="mode-tab">Magic Link</button>
+      </div>
+
+      <!-- Email & Password Form -->
+      <form id="password-auth-form">
+        <div class="form-group">
+          <label for="pw-email-input">Email ID</label>
+          <input
+            type="email"
+            id="pw-email-input"
+            class="form-input"
+            placeholder="you@example.com"
+            required
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="pw-password-input">Password</label>
+          <input
+            type="password"
+            id="pw-password-input"
+            class="form-input"
+            placeholder="Enter password (min 6 chars)"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+
+        <div class="form-group" id="confirm-password-group" style="display: none;">
+          <label for="pw-confirm-input">Confirm Password</label>
+          <input
+            type="password"
+            id="pw-confirm-input"
+            class="form-input"
+            placeholder="Re-enter password"
+            autocomplete="new-password"
+          />
+        </div>
+
+        <button type="submit" id="pw-submit-btn" class="btn btn-primary">
+          <span>Sign In with Email</span>
+        </button>
+
+        <div class="secondary-actions">
+          <button type="button" id="toggle-signup-btn" class="link-btn">Create new account</button>
+          <button type="button" id="forgot-password-btn" class="link-btn">Forgot password?</button>
+        </div>
+      </form>
+
+      <!-- Passwordless Magic Link Form -->
+      <form id="auth-form" style="display: none;">
+        <div class="form-group">
+          <label for="email-input">Email Address</label>
+          <input
+            type="email"
+            id="email-input"
+            class="form-input"
+            placeholder="you@example.com"
+            required
+            autocomplete="email"
+          />
+        </div>
+
+        <button type="submit" id="send-link-btn" class="btn btn-primary">
+          <span>Send Magic Link</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Signed-In View -->
+    <div id="user-profile-container" class="user-profile">
+      <div class="user-avatar" id="avatar-initials">US</div>
+      <div class="user-email" id="profile-email">user@example.com</div>
+      <div class="user-uid" id="profile-uid">UID: -</div>
+      <p id="auth-method-label" style="font-size: 12px; color: var(--success); margin-top: 8px; font-weight: 500;">✓ Authenticated via Firebase</p>
+
+      <button id="sign-out-btn" class="btn btn-danger">
+        <span>Sign Out</span>
+      </button>
+    </div>
+
+    <div class="footer-note">
+      Cross-Platform Firebase Auth &bull; Android &bull; Web &bull; iOS
+    </div>
+  </div>
+
+  <!-- Firebase Modular JS SDK (v10) & Custom Auth Scripts -->
+  <script type="module" src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "Eduverse",
+  "description": "Eduverse — Interactive e-learning platform with video lessons, AI quizzes, real-time progress tracking, and analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
